@@ -11,7 +11,10 @@
 #   CONFLICT #n <sha>             a PR's head no longer merges into its base (once per head)
 #   MAIN-OK run <id>              a run on main succeeded
 #   CANCELLED-MAIN mid-run <id>   a main run was cancelled after a job had started
-#   FAIL <conclusion> ...         any other run finished badly
+#   FAIL <conclusion> ...         any other run finished badly, of any workflow (it names which):
+#                                 a failure on the default branch is news whichever workflow had
+#                                 it, so a workflow that cannot succeed yet is gated to skip there,
+#                                 not ignored here
 #   STALL: ...                    runs queued and no runner busy for 15 minutes
 #
 # Draft PRs are left out: CI skips every job on a draft, which would read as READY.
@@ -43,10 +46,10 @@ token="$$-$(date +%s)"
 echo "$token" > "$D/owner"
 while true; do
   [ "$(cat "$D/owner" 2>/dev/null)" = "$token" ] || exit 0
-  gh run list -R "$R" -L 40 --json databaseId,status,conclusion,headBranch,event \
-    --jq '.[]|"\(.databaseId) \(.status) \(.conclusion) \(.headBranch) \(.event)"' \
+  gh run list -R "$R" -L 40 --json databaseId,status,conclusion,headBranch,event,workflowName \
+    --jq '.[]|"\(.databaseId) \(.status) \(.conclusion) \(.headBranch) \(.event) \(.workflowName)"' \
     > "$D/now" 2>/dev/null || { sleep 60; continue; }
-  while read -r id st concl br ev; do
+  while read -r id st concl br ev wf; do
     [ "$st" = completed ] || continue
     grep -qx "$id" "$D/runs" && continue
     echo "$id" >> "$D/runs"
@@ -62,7 +65,7 @@ while true; do
             --jq '[.jobs[]|select((.steps|length)>0)]|length' 2>/dev/null || echo 0)
           [ "$ran" != 0 ] && echo "CANCELLED-MAIN mid-run $id"
         fi ;;
-      *) echo "FAIL $concl branch=$br event=$ev run=$id https://github.com/$R/actions/runs/$id" ;;
+      *) echo "FAIL $concl workflow=\"$wf\" branch=$br event=$ev run=$id https://github.com/$R/actions/runs/$id" ;;
     esac
   done < "$D/now"
   # A failed check is news the moment it fails, not when its run's other jobs finish: a run's
