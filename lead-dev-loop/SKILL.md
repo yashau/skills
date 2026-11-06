@@ -18,8 +18,10 @@ rule, use the repo's.
 
 1. **Understand the ask.** Restate it to yourself as outcomes. If a choice is the owner's
    (product, scope, spend, anything irreversible or outward-facing) ask it now, one question at
-   a time, each with a recommended option first (see `references/owner.md`). Everything else,
-   decide and say what you decided.
+   a time, each with a recommended option first (see `references/owner.md`). While agents or
+   PRs are in flight, ask in plain message text, never with a tool that blocks until answered:
+   the loop must keep merging while the owner thinks. Everything else, decide and say what you
+   decided.
 2. **Split it** into independent pieces that can each become one reviewable PR. Pieces that
    touch the same files are sequential, not parallel.
 3. **Brief an agent per piece**, in its own worktree (`isolation: "worktree"`), in the

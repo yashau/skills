@@ -32,3 +32,10 @@ For the next session if this one dies mid-task:
 
 A session scratch directory for briefs, ledgers, reports, screenshots and logs. Name files by
 task. Spend ledgers record time, forecast, actual and running total.
+
+## Timed steps
+
+A subagent only resumes when it gets a message; it cannot wake itself at a time. When a step must
+wait for a time (a new spending day, a window after a deploy), schedule a wake for the lead (a
+one-shot scheduled message or the harness's own timer) and have the lead send the agent "go"
+then; write the wake and its purpose in the handoff file.

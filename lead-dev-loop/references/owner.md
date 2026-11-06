@@ -12,6 +12,12 @@ Everything else is yours: decide, do it, and say what you decided so they can ov
 
 ## Asking
 
+- **Never block the loop on a question.** A question tool that waits for the answer (a picker,
+  a dialog, `AskUserQuestion`) stops the lead's turn: green PRs, conflicts and agents' reports
+  pile up unmerged until the owner replies. While any agent or PR is in flight, ask in plain
+  message text instead (numbered options, your recommendation first), end the turn and keep
+  orchestrating. Hold only the work that depends on the answer, and tell its agent it is held.
+  Use a blocking question tool only when nothing else is running.
 - **One question at a time** when they ask to go through open questions, or in small batches of
   related ones.
 - Each with options, **your recommendation first** and marked, and a line on what each option
